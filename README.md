@@ -8,7 +8,7 @@ Two datasets --->
 2. tic-tac-toe.data
 
 Python files:
-ann.py- Neural network  classification for datset 1   
+ann.py- Neural network  classification for dataset 1   
 
 ann1.py- Neural network classification for datset 2
 
@@ -24,8 +24,8 @@ knn.py- K-nearest neighbors for dataset 1
 
 knn1.py- K-nearest neighbors for dataset 2
 
-boost.py- Adaboost classification for datset 1
+boost.py- Adaboost classification for dataset 1
 
-boost1.py- Adaboost classification for datset 2
+boost1.py- Adaboost classification for dataset 2
 
 
