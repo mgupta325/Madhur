@@ -4,9 +4,8 @@ from sklearn import preprocessing, datasets,svm
 import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 from sklearn.metrics import accuracy_score
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.ensemble import AdaBoostClassifier
+
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.model_selection import learning_curve
 from sklearn.model_selection import validation_curve
 from sklearn.metrics import confusion_matrix
@@ -48,11 +47,11 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None, n_jobs=None,
 def plot_validation_curve(X,y,estimator,name):
 
     if name == 'k1':
-        param_range = np.arange(10,100,10)
+        param_range = np.arange(20,50,5)
         param_name = 'n_estimators'
-    # if name == 'k2':
-    #       param_range = np.arange(4,20,2)
-    #       param_name = 'max_depth'
+    if name == 'k2':
+          param_range = np.arange(2,14,2)
+          param_name = 'max_depth'
 
 
     train_scores, test_scores = validation_curve(estimator, X, y, param_name=param_name, param_range=param_range, cv=5,
@@ -87,9 +86,9 @@ tar1=df[:,64]
 X=dat
 y=tar1
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=20)
-clf=DecisionTreeClassifier()
-boostc = AdaBoostClassifier(base_estimator=clf)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=20)
+
+boostc = GradientBoostingClassifier(n_estimators=30,max_depth=6)
 s1=time.time()
 boostc.fit(X_train,y_train)
 e1=time.time()
@@ -105,35 +104,32 @@ print(boostc.get_params())
 print("Training time: ",t1)
 #print("Testing time: ",t2)
 plot_learning_curve(boostc,'Learning Curve for boosting', X_train, y_train, (0,1.01),cv=5)
-# plot_tree(boostc.fit(X_train, y_train),filled=True)
-# plt.show()
-clf1=DecisionTreeClassifier(max_depth=12,max_leaf_nodes=240)
-boostc1 = AdaBoostClassifier(base_estimator=clf1)
+
+boostc1 = GradientBoostingClassifier()
 plot_validation_curve(X_train,y_train,boostc1,'k1')
-#plot_validation_curve(X_train,y_train,boostc1,'k2')
-# plot_validation_curve(X_train,y_train,clf1,'dtree1')
-# #plot_validation_curve(X_train,y_train,clf1,'dtree2')
+plot_validation_curve(X_train,y_train,boostc1,'k2')
+#plot_validation_curve(X_train,y_train,boostc1,'k3')
 # plot_validation_curve(X_train,y_train,clf1,'dtree3')
 
 
-clf3=DecisionTreeClassifier(max_depth=12,max_leaf_nodes=240,ccp_alpha=0.01)
-boostc3 = AdaBoostClassifier(base_estimator=clf3)
-boostc3=GridSearchCV(estimator=boostc3,param_grid={'n_estimators':np.arange(30,60,10),'learning_rate':[1,1.2]},cv=5)
+boostc3 = GradientBoostingClassifier()
+boostc3=GridSearchCV(estimator=boostc3,param_grid={'n_estimators':np.arange(20,40,10),'learning_rate':[0.5],'max_depth':np.arange(4,8,2),'max_leaf_nodes':[180,250]},cv=5)
 x1=time.time()
 boostc3.fit(X_train,y_train)
 x2=time.time()
-print(x2-x1)
+print(x2-x1,"training time")
 x11=time.time()
 y_prd1=boostc3.predict(X_test)
 x22=time.time()
-print(x22-x11)
+print(x22-x11,"testing time")
 y_prd1 = np.array(y_prd1)
 print('Test Accuracy after grid search fit: %.8f' % accuracy_score(y_test,y_prd1))
 print(boostc3.best_params_,boostc3.best_score_)
-plot_learning_curve(boostc3,'Learning Curve for boosting', X_train, y_train, (0,1.01),cv=5)
+boostc4 = GradientBoostingClassifier(max_depth=4,max_leaf_nodes=200,n_estimators=20,ccp_alpha=0.0001)
+boostc4.fit(X_train,y_train)
+plot_learning_curve(boostc4,'Learning Curve for boosting', X_train, y_train, (0,1.01),cv=5)
+
 #if learning curve take too much time then create clf4 with best parameters as arguments
-
-
 
 
 
