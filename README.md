@@ -1,7 +1,7 @@
 # Madhur
 ML assignment 1
 
-To run the code : just open the required python file  and run it(files named according to the classifier type and dataset to run on.)
+To run the code : just open the required python file  and run it. (files named according to the classifier type and dataset to run on.)
 
 Two datasets --->
 1. digits.training.tra
@@ -10,7 +10,7 @@ Two datasets --->
 Python files:
 ann.py- Neural network  classification for dataset 1   
 
-ann1.py- Neural network classification for datset 2
+ann1.py- Neural network classification for dataset 2
 
 svm.py- Support vector machine classfication for dataset 1
 
@@ -24,8 +24,9 @@ knn.py- K-nearest neighbors for dataset 1
 
 knn1.py- K-nearest neighbors for dataset 2
 
-boost.py- Adaboost classification for dataset 1
+boost.py- Boosting for dataset 1
 
-boost1.py- Adaboost classification for dataset 2
+boost1.py- Boosting for dataset 2
 
+Python libraries used: scikit learn(sklearn),numpy,pandas,warnings.
 
