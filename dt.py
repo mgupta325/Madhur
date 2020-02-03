@@ -6,7 +6,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import learning_curve
 from sklearn.model_selection import validation_curve
 from sklearn.metrics import confusion_matrix
-import itertools
+
 import time
 import pandas as pd
 from sklearn.model_selection import GridSearchCV
