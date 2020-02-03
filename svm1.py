@@ -32,6 +32,7 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None, n_jobs=None,
     train_scores_std = np.std(train_scores, axis=1)
     test_scores_mean = np.mean(test_scores, axis=1)
     test_scores_std = np.std(test_scores, axis=1)
+    print('cross-validation scores', test_scores_mean)
     plt.grid()
 
     plt.fill_between(train_sizes, train_scores_mean - train_scores_std, train_scores_mean + train_scores_std, alpha=0.1, color="b")
@@ -46,7 +47,13 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None, n_jobs=None,
 
 def plot_validation_curve(X,y,estimator,name):
 
-    if name == 'C':
+    if name == 'C with polynomial kernel':
+        param_range = np.arange(.1, 2.4,.4)
+        param_name = 'C'
+    if name == 'C with rbf kernel':
+        param_range = np.arange(.1, 2.4,.4)
+        param_name = 'C'
+    if name == 'C with linear kernel':
         param_range = np.arange(.1, 2.4,.4)
         param_name = 'C'
 
@@ -74,7 +81,7 @@ def plot_validation_curve(X,y,estimator,name):
 
 
 df = pd.read_csv('tic-tac-toe.data', sep=",", skiprows=0)
-print(df.head(10))
+
 df=np.array(df)
 print(df.shape,df.dtype)
 dat=df[:,0:9]
@@ -84,38 +91,40 @@ y=tar1
 print(y.dtype)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=20)
-clf=svm.SVC()
+clf=svm.SVC(kernel='poly')
 s1=time.time()
 clf.fit(X_train,y_train)
 e1=time.time()
-s2=time.time()
-y_prd=clf.predict(X_test)
-e2=time.time()
+# s2=time.time()
+# y_prd=clf.predict(X_test)
+# e2=time.time()
 t1=e1-s1
-t2=e2-s2
+#t2=e2-s2
 y_test = np.array(y_test)
-y_prd = np.array(y_prd)
+#y_prd = np.array(y_prd)
 print(clf.get_params())
-print('Test Accuracy: %.8f' % accuracy_score(y_test,y_prd))
+#print('Test Accuracy: %.8f' % accuracy_score(y_test,y_prd))
 print("Training time: ",t1)
-print("Testing time: ",t2)
+#print("Testing time: ",t2)
 plot_learning_curve(clf,'Learning Curve for svm', X_train, y_train, (0,1.01),cv=5)
 # plot_tree(clf.fit(X_train, y_train),filled=True)
 # plt.show()
 clf1=svm.SVC(gamma='scale',kernel='poly')
-plot_validation_curve(X_train,y_train,clf1,'C')
-plot_validation_curve(X_train,y_train,svm.SVC(gamma='scale',kernel='rbf'),'C')
-# plot_validation_curve(X_train,y_train,clf1,'dtree3')
+plot_validation_curve(X_train,y_train,clf1,'C with polynomial kernel')
+plot_validation_curve(X_train,y_train,svm.SVC(gamma='scale',kernel='rbf'),'C with rbf kernel')
+plot_validation_curve(X_train,y_train,svm.SVC(gamma='scale',kernel='linear'),'C with linear kernel')
 
-x1=time.time()
+
 clf3=svm.SVC()
 clf3=GridSearchCV(estimator=clf3,param_grid={'C':np.arange(.1,2,.4),'tol':[0.005,.01],'kernel':['linear','rbf','poly']},cv=5)
-x2=time.time()
-print(x2-x1)
+x1=time.time()
 clf3.fit(X_train,y_train)
-# #  plot_tree(clf1.fit(X_train, y_train),filled=True)
-# #  plt.show()
+x2=time.time()
+print(x2-x1,"train time")
+x11=time.time()
 y_prd1=clf3.predict(X_test)
+x21=time.time()
+print(x21-x11,"test time")
 y_prd1 = np.array(y_prd1)
 print('Test Accuracy after grid search fit: %.8f' % accuracy_score(y_test,y_prd1))
 print(clf3.best_params_,clf3.best_score_)
@@ -123,10 +132,6 @@ clf4=svm.SVC(tol=.002,kernel='rbf',C=1.7)
 clf4.fit(X_train,y_train)
 print(clf.support_vectors_)
 plot_learning_curve(clf4,'Learning Curve for svm', X_train, y_train, (0,1.01),cv=5)
-
-#choose subset of data for training
-#plot validation curve for 3 kernels/parameter and use best kernel as a parameter in gridsearch cv
-#param-> C,gamma,kernel,tol
 
 
 

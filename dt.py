@@ -1,12 +1,8 @@
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn import preprocessing, datasets,svm
 import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 from sklearn.metrics import accuracy_score
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.ensemble import AdaBoostClassifier
 from sklearn.model_selection import learning_curve
 from sklearn.model_selection import validation_curve
 from sklearn.metrics import confusion_matrix
@@ -33,6 +29,7 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None, n_jobs=None,
     train_scores_std = np.std(train_scores, axis=1)
     test_scores_mean = np.mean(test_scores, axis=1)
     test_scores_std = np.std(test_scores, axis=1)
+    print('cross-validation scores', test_scores_mean)
     plt.grid()
 
     plt.fill_between(train_sizes, train_scores_mean - train_scores_std, train_scores_mean + train_scores_std, alpha=0.1, color="b")
@@ -84,7 +81,7 @@ def plot_validation_curve(X,y,estimator,name):
 
 
 df = pd.read_csv('digits_training.tra', sep=",", skiprows=0)
-print(df.head(10))
+
 df=np.array(df)
 print(df.shape,df.dtype)
 dat=df[:,0:64]
@@ -97,17 +94,17 @@ clf= DecisionTreeClassifier()
 s1=time.time()
 clf.fit(X_train,y_train)
 e1=time.time()
-s2=time.time()
-y_prd=clf.predict(X_test)
-e2=time.time()
+# s2=time.time()
+# y_prd=clf.predict(X_test)
+# e2=time.time()
 t1=e1-s1
-t2=e2-s2
+# t2=e2-s2
 y_test = np.array(y_test)
-y_prd = np.array(y_prd)
+#y_prd = np.array(y_prd)
 print(clf.get_depth(),clf.get_n_leaves())
-print('Test Accuracy: %.8f' % accuracy_score(y_test,y_prd))
+#print('Test Accuracy: %.8f' % accuracy_score(y_test,y_prd))
 print("Training time: ",t1)
-print("Testing time: ",t2)
+# print("Testing time: ",t2)
 plot_learning_curve(clf,'Learning Curve for Decision Tree', X_train, y_train, (0,1.01),cv=5)
 # plot_tree(clf.fit(X_train, y_train),filled=True)
 # plt.show()
@@ -131,15 +128,19 @@ plot_validation_curve(X_train,y_train,clf1,'dtree3')
 # print('Test Accuracy: %.8f' % accuracy_score(y_test,y_prd))
 # plot_tree(clf2.fit(X_train, y_train),filled=True)
 # plt.show()
-x1=time.time()
+
 clf3=DecisionTreeClassifier()
-clf3=GridSearchCV(estimator=clf3,param_grid={'max_depth': np.arange(10,20,2),'min_samples_split':np.arange(4,10,2),'max_leaf_nodes':np.arange(220,280,10)},cv=5)
-x2=time.time()
-print(x2-x1)
+clf3=GridSearchCV(estimator=clf3,param_grid={'max_depth': np.arange(10,16,2),'max_leaf_nodes':np.arange(220,280,10)},cv=5)
+x1=time.time()
 clf3.fit(X_train,y_train)
+x2=time.time()
+print(x2-x1,"train time")
 # #  plot_tree(clf1.fit(X_train, y_train),filled=True)
 # #  plt.show()
+x11=time.time()
 y_prd1=clf3.predict(X_test)
+x21=time.time()
+print(x21-x11,"test time")
 y_prd1 = np.array(y_prd1)
 print('Test Accuracy after grid search fit: %.8f' % accuracy_score(y_test,y_prd1))
 print(clf3.best_params_,clf3.best_score_)
@@ -168,7 +169,7 @@ ax.plot(ccp_alphas, test_scores, marker='o', label="test",
         drawstyle="steps-post")
 ax.legend()
 plt.show()
-clf = DecisionTreeClassifier(max_depth=14,max_leaf_nodes=260,random_state=0, ccp_alpha=0.002)
+clf = DecisionTreeClassifier(max_depth=14,max_leaf_nodes=260,random_state=0, ccp_alpha=0.001)
 clf.fit(X_train, y_train)
 print(clf.score(X_test, y_test),'score')
 print(clf.get_depth(),clf.get_n_leaves())

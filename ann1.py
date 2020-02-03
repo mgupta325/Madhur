@@ -33,8 +33,9 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None, n_jobs=None,
     train_scores_std = np.std(train_scores, axis=1)
     test_scores_mean = np.mean(test_scores, axis=1)
     test_scores_std = np.std(test_scores, axis=1)
+    print('cross-validation scores', test_scores_mean)
     plt.grid()
-    print(train_scores_mean)
+
     plt.fill_between(train_sizes, train_scores_mean - train_scores_std, train_scores_mean + train_scores_std, alpha=0.1, color="b")
     plt.fill_between(train_sizes, test_scores_mean - test_scores_std,test_scores_mean + test_scores_std, alpha=0.1, color="g")
     plt.plot(train_sizes, train_scores_mean, 'o-', color="b", label="Training score")
@@ -48,7 +49,7 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None, n_jobs=None,
 def plot_validation_curve(X,y,estimator,name):
 
     if name == 'a':
-        param_range = np.linspace(0.001,0.4,10)
+        param_range = np.linspace(0.001,0.01,10)
         param_name = 'tol'
     if name == 'b':
          param_range =np.linspace(0.001,.1,10)
@@ -59,6 +60,7 @@ def plot_validation_curve(X,y,estimator,name):
     if name == 'm':
           param_range = np.arange(0.1,1,.1)
           param_name = 'momentum'
+
 
     train_scores, test_scores = validation_curve(estimator, X, y, param_name=param_name, param_range=param_range, cv=5,
                                                  scoring="accuracy", n_jobs=1)
@@ -84,7 +86,7 @@ def plot_validation_curve(X,y,estimator,name):
 
 
 df = pd.read_csv('tic-tac-toe.data', sep=",", skiprows=0)
-print(df.head(10))
+
 df=np.array(df)
 print(df.shape,df.dtype)
 dat=df[:,0:9]
@@ -97,18 +99,17 @@ clf=MLPClassifier(tol=0.01,solver='sgd',activation='tanh')
 s1=time.time()
 clf.fit(X_train,y_train)
 e1=time.time()
-s2=time.time()
-y_prd=clf.predict(X_test)
-
-e2=time.time()
+# s2=time.time()
+# y_prd=clf.predict(X_test)
+# e2=time.time()
 t1=e1-s1
-t2=e2-s2
+# t2=e2-s2
 y_test = np.array(y_test)
-y_prd = np.array(y_prd)
-print(clf.n_iter_,clf.n_layers_,clf.n_outputs_)
-print('Test Accuracy: %.8f' % accuracy_score(y_test,y_prd))
+#y_prd = np.array(y_prd)
+print(clf.n_iter_,clf.n_layers_,clf.n_outputs_,clf.classes_)
+#print('Test Accuracy: %.8f' % accuracy_score(y_test,y_prd))
 print("Training time: ",t1)
-print("Testing time: ",t2)
+#print("Testing time: ",t2)
 
 plt.ylabel('cost')
 plt.xlabel('iterations')
@@ -122,37 +123,24 @@ clf1=MLPClassifier(solver='sgd')
 plot_validation_curve(X_train,y_train,clf1,'a')
 plot_validation_curve(X_train,y_train,MLPClassifier(solver='sgd',tol=1e-2),'b')
 plot_validation_curve(X_train,y_train,MLPClassifier(solver='sgd',tol=1e-2),'lr')
-plot_validation_curve(X_train,y_train,MLPClassifier(solver='sgd',tol=1e-2),'m')
+#plot_validation_curve(X_train,y_train,MLPClassifier(solver='sgd',tol=1e-2),'m')
 
-# plot_validation_curve(X_train,y_train,clf1,'dtree3')
-# clf2=MLPClassifier(activation='logistic',max_iter=100,tol=0.01,solver='sgd')
-#
-# plot_learning_curve(clf2,'Learning Curve for neural network', X_train, y_train,ylim=(0.3,1.1),cv=5)
-# clf2.fit(X_train,y_train)
-# e1=time.time()
-# s2=time.time()
-# y_prd=clf2.predict(X_test)
-# e2=time.time()
-# t1=e1-s1
-# t2=e2-s2
-# y_test = np.array(y_test)
-# y_prd = np.array(y_prd)
-# print('Test Accuracy: %.8f' % accuracy_score(y_test,y_prd))
 
+clf3=MLPClassifier(solver='sgd',learning_rate_init=0.6)
+clf3=GridSearchCV(estimator=clf3,param_grid={'tol':[0.01,.03],'alpha':[.02,.07],'activation': ['relu','logistic','tanh']},cv=5)
 x1=time.time()
-clf3=MLPClassifier(solver='sgd')
-clf3=GridSearchCV(estimator=clf3,param_grid={'momentum':[0.1,.5],'tol':[0.01,.03],'alpha':[.02,.03],'activation': ['relu','logistic','tanh']},cv=5)
-x2=time.time()
-print(x2-x1)
 clf3.fit(X_train,y_train)
-# #  plot_tree(clf1.fit(X_train, y_train),filled=True)
-# #  plt.show()
+x2=time.time()
+print(x2-x1,"train time")
+x11=time.time()
 y_prd1=clf3.predict(X_test)
+x21=time.time()
+print(x21-x11,"test time")
 y_prd1 = np.array(y_prd1)
 print('Test Accuracy after grid search fit: %.8f' % accuracy_score(y_test,y_prd1))
 print(clf3.best_params_,clf3.best_score_)
 
-clf4=MLPClassifier(solver='sgd',activation='tanh',alpha=0.02,momentum=0.5,tol=0.01)
+clf4=MLPClassifier(solver='sgd',activation='relu',learning_rate_init=0.7,alpha=0.03,tol=0.01)
 clf4.fit(X_train,y_train)
 plt.ylabel('cost')
 plt.xlabel('iterations')
@@ -163,3 +151,4 @@ print(clf4.n_layers_,clf4.n_iter_)
 plot_learning_curve(clf4,'Learning Curve for neural network', X_train, y_train, (0,1.01),cv=5)
 
 
+#include # of layers as a prameter
