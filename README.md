@@ -1,4 +1,4 @@
-# Madhur
+# ML assignment 1
 ML assignment 1
 
 To run the code :
